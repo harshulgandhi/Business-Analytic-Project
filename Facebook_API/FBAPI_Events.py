@@ -4,7 +4,7 @@ from simplejson import loads
 '''
 this class gets event data and also the list of people 
 attending that event. 
-It creates a list of event and there corresponding attendees.
+Output is in dictionary format {key:value}
 '''
 debug = True
 class FBAPI_Events:
@@ -30,14 +30,8 @@ class FBAPI_Events:
 		#jsonData = urlopen('https://graph.facebook.com/v2.2/859809790727785/attending?access_token=CAACEdEose0cBAEPtuZAZA5xHpmed019ZCGtx2KnnWquv4HusEIw7iFcjJUeGvOoZAjE2G0hZAvrXysrxKqOrFePEXSXTtArCPNkOlAeLVFDZBFUlWfOlEs1KNqZCzcUZCCEVeZCcD2tZB6QxPHsjHrqwgdZCdkKBlvJTGkYCbua6jCzGCYZCt9PRXTBYKOCAQ3mMPnHSq2mqkyK01ZAyPBXhgLfCr')
 		attendeeInfo = urlopen(urlEventAttendees)
 		attendeeInfoDict = loads(attendeeInfo.read())
-		if(debug):
-			print attendeeInfoDict
-			print "Printing ID of first attendee"
-			keyList = []
-			for key in attendeeInfoDict.keys():
-				keyList.append(key)
-			print attendeeInfoDict[keyList[1]][0]['id']
-			
+		return attendeeInfoDict
+
 			
 		#content = loads(urlopen('https://graph.facebook.com/v2.2/search?q=Rang Barsay&type=event').read())
 		
@@ -51,8 +45,5 @@ class FBAPI_Events:
 		
  		
 
-
-fbapi1 = FBAPI_Events()
-fbapi1.getEventById('859809790727785')
 
 
