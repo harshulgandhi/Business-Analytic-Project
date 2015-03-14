@@ -18,7 +18,8 @@ class FBAPI_Events:
 	'''
 	def getEventById(self, id):
 		#first we get event info only
-		urlEvent = 'https://graph.facebook.com/v2.2/'+id+'/?access_token=CAACEdEose0cBAAqnNgZCcioLpbvaCqAW2yaWiwJRWr18b3PAvCXmTU0t4HvuqwZCmzZAZCzZBRdfvvVo8uEFF5TOmqjBsI3qCiQ0KcnaSRybRS9CKjuHKJmwpVZAnOg9xi7mMoPgru6inTi7ZAz6sZABjXhWTzGKDKtNcJCsOBDfnSc7ZAHT5StgqDeW44ZAfRTCEeUlvHHZAxEJloCt2vKRgxq'
+		access_token = 'CAACEdEose0cBAG0nIoxCXAwko1p0RHarL7exWjACFcNBgCIVLZCfVeyC4YLqj0yBXYZBjL3FoFpcG4lRe7XkxFSfjsWCnMBGdqKfGNKVijKRSZCYyXNp7oh8455kWIN5DPRXNpP62idOePwefWFkhZAfB9TDAyjXnjc2Pad0TztQZCxCFpMZBD3LmMbE5i3Gmb6qIdWGUcQYZAML6SfHIpJ'
+		urlEvent = 'https://graph.facebook.com/v2.2/'+id+'/?access_token='+access_token
 		eventInfo = urlopen(urlEvent)		#in json format
 		eventInfoDict = loads(eventInfo.read()) 	#in dictionary format
 		if(debug):
@@ -26,7 +27,7 @@ class FBAPI_Events:
 
 			
 		#second we get attendees list
-		urlEventAttendees = 'https://graph.facebook.com/v2.2/'+id+'/attending?access_token=CAACEdEose0cBAAqnNgZCcioLpbvaCqAW2yaWiwJRWr18b3PAvCXmTU0t4HvuqwZCmzZAZCzZBRdfvvVo8uEFF5TOmqjBsI3qCiQ0KcnaSRybRS9CKjuHKJmwpVZAnOg9xi7mMoPgru6inTi7ZAz6sZABjXhWTzGKDKtNcJCsOBDfnSc7ZAHT5StgqDeW44ZAfRTCEeUlvHHZAxEJloCt2vKRgxq'
+		urlEventAttendees = 'https://graph.facebook.com/v2.2/'+id+'/attending?access_token='+access_token
 		#jsonData = urlopen('https://graph.facebook.com/v2.2/859809790727785/attending?access_token=CAACEdEose0cBAEPtuZAZA5xHpmed019ZCGtx2KnnWquv4HusEIw7iFcjJUeGvOoZAjE2G0hZAvrXysrxKqOrFePEXSXTtArCPNkOlAeLVFDZBFUlWfOlEs1KNqZCzcUZCCEVeZCcD2tZB6QxPHsjHrqwgdZCdkKBlvJTGkYCbua6jCzGCYZCt9PRXTBYKOCAQ3mMPnHSq2mqkyK01ZAyPBXhgLfCr')
 		attendeeInfo = urlopen(urlEventAttendees)
 		attendeeInfoDict = loads(attendeeInfo.read())
