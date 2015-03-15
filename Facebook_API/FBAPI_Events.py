@@ -18,7 +18,7 @@ class FBAPI_Events:
 	'''
 	def getEventById(self, id):
 		#first we get event info only
-		access_token = 'CAACEdEose0cBAG0nIoxCXAwko1p0RHarL7exWjACFcNBgCIVLZCfVeyC4YLqj0yBXYZBjL3FoFpcG4lRe7XkxFSfjsWCnMBGdqKfGNKVijKRSZCYyXNp7oh8455kWIN5DPRXNpP62idOePwefWFkhZAfB9TDAyjXnjc2Pad0TztQZCxCFpMZBD3LmMbE5i3Gmb6qIdWGUcQYZAML6SfHIpJ'
+		access_token = 'CAACEdEose0cBAIS2Yfvx57EPnwVpZCKPSdCRNCe0gp2r8B3USbYgsctdWHYQXZBHZAyUMC43FEnPDBtOdeG6B9pvstTNTLRligtCN7d42FlLZABdYgjZAEn6YInVwBseVLh6dgwjAj5oknJWkrvuzX9muBSNNfLX1St2Wo08vpRnTUyTExjfYkCvtSLV0UbPSoZANl6O0OMIVaFO7ihbZB3'
 		urlEvent = 'https://graph.facebook.com/v2.2/'+id+'/?access_token='+access_token
 		eventInfo = urlopen(urlEvent)		#in json format
 		eventInfoDict = loads(eventInfo.read()) 	#in dictionary format
