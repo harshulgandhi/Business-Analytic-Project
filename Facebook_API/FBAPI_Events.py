@@ -12,7 +12,7 @@ dataPerEvent = []
 attendingCount = 0
 declinedCount = 0
 maybeCount = 0
-access_token = 'CAACEdEose0cBAH6kvqF4duJj5SGNeHXTRRGWjrnqzaBMHBJ6gV5ZBBMGMgHdLU0OxmVmfQu0wif4O01IQ35Mq7OQp5fwNpNQisNRYviCt7Cm7nOXkJrmUNHOWDC9T5qEwaFThLneeu0uGQyuHa3fjrlQfHacqeIGrFXPYKBkl8Qs9n9lJhGkhN92fojdogPgL7R60mu7WhE5Lw07l'
+access_token = 'CAACEdEose0cBAMFVm1c8Cy4JB9vmQPNb3joW3PFIA8zlJKPgxuhK8cblFeQ3WAKf9ZBV1KqI8tlZBBk7zyiMOZC7ZB1POUDJTB6ZAd4xNYsxGYWtTbTE6FmjPQb4sZBJIB1t4tZAa90zBD3yLPd6dZBVwJd5lTdDZBVyz6J4EagG6LsBSBOFeJn3LEsPLcYwM6ZCEonEsOLEtW31gtZAUc5pSUw'
 class FBAPI_Events:
 	'Class to make API calls to facebook and fetch event details'
 	def __init__(self):
@@ -65,31 +65,65 @@ class FBAPI_Events:
 			print dataPerEvent
 
 
-
-	def parseEventAttendee(self,inviteeInfoDict):
+	'''
+	Function to parse event attendee info
+	and count different categories
+	@param: inviteeInfo in dictionary format
+	'''
+	def parseEventAttendee(self,id):
 		global dataPerEvent, attendingCount, declinedCount, maybeCount			
-		for key in inviteeInfoDict.keys():
-			print "Key found is : "+key
-			if(key == 'data'):
-				for i in range (0,len(inviteeInfoDict[key]),1):
-					print "inviteeInfoDict[key][i]['rsvp_status'] :"+ inviteeInfoDict[key][i]['rsvp_status']
-					print
-					if(inviteeInfoDict[key][i]['rsvp_status'] == 'attending'):
-						attendingCount=attendingCount + 1
-					elif(inviteeInfoDict[key][i]['rsvp_status'] == 'declined'):
-						declinedCount= declinedCount + 1
-					elif(inviteeInfoDict[key][i]['rsvp_status'] == 'unsure'):
-						maybeCount= maybeCount + 1			
-			elif(key == 'paging'): 
-				if('next' in inviteeInfoDict['paging']):
-					if(debug):
-						print "TRAVERSING TO THE NEXT PAGE!PLEASE WAIT...."
-					self.parseEventAttendee(self.getEventInvitees(inviteeInfoDict['paging']['next']))
-				else:
-					dataPerEvent.append(attendingCount)
-					dataPerEvent.append(declinedCount)
-					dataPerEvent.append(maybeCount)		
-					return
+		#Count attending users
+		urlEventInvitees = 'https://graph.facebook.com/v2.2/'+id+'/attending?access_token='+access_token
+		inviteeInfoDict = self.getEventInvitees(urlEventInvitees)
+		while True: 
+			attendingCount = attendingCount + len(inviteeInfoDict['data'])
+			if  ('next' not in inviteeInfoDict['paging']):
+				break
+			inviteeInfoDict = self.getEventInvitees(inviteeInfoDict['paging']['next'])
+
+		#Count declined users
+		urlEventInvitees = 'https://graph.facebook.com/v2.2/'+id+'/declined?access_token='+access_token
+		inviteeInfoDict = self.getEventInvitees(urlEventInvitees)
+		while True:
+			declinedCount = declinedCount + len(inviteeInfoDict['data'])
+			if  ('next' not in inviteeInfoDict['paging']):
+				break
+			inviteeInfoDict = self.getEventInvitees(inviteeInfoDict['paging']['next'])
+
+		#Count maybe users
+		urlEventInvitees = 'https://graph.facebook.com/v2.2/'+id+'/maybe?access_token='+access_token
+		inviteeInfoDict = self.getEventInvitees(urlEventInvitees)
+		while True:
+			maybeCount = maybeCount + len(inviteeInfoDict['data'])
+			if  ('next' not in inviteeInfoDict['paging']):
+				break
+			inviteeInfoDict = self.getEventInvitees(inviteeInfoDict['paging']['next'])
+
+		dataPerEvent.append(attendingCount)
+		dataPerEvent.append(declinedCount)
+		dataPerEvent.append(maybeCount)		
+		# for key in inviteeInfoDict.keys():
+		# 	print "Key found is : "+key
+		# 	if(key == 'data'):
+		# 		for i in range (0,len(inviteeInfoDict[key]),1):
+		# 			print "inviteeInfoDict[key][i]['rsvp_status'] :"+ inviteeInfoDict[key][i]['rsvp_status']
+		# 			print
+		# 			if(inviteeInfoDict[key][i]['rsvp_status'] == 'attending'):
+		# 				attendingCount=attendingCount + 1
+		# 			elif(inviteeInfoDict[key][i]['rsvp_status'] == 'declined'):
+		# 				declinedCount= declinedCount + 1
+		# 			elif(inviteeInfoDict[key][i]['rsvp_status'] == 'unsure'):
+		# 				maybeCount= maybeCount + 1			
+		# 	elif(key == 'paging'): 
+		# 		if('next' in inviteeInfoDict['paging']):
+		# 			if(debug):
+		# 				print "TRAVERSING TO THE NEXT PAGE!PLEASE WAIT...."
+		# 			self.parseEventAttendee(self.getEventInvitees(inviteeInfoDict['paging']['next']))
+		# 		else:
+		# 			dataPerEvent.append(attendingCount)
+		# 			dataPerEvent.append(declinedCount)
+		# 			dataPerEvent.append(maybeCount)		
+		# 			return
 
 
 	'''
@@ -110,9 +144,9 @@ class FBAPI_Events:
 		for i in range(0,len(eventIdList),1):
 			eventInfoDict = self.getEventById(eventIdList[i])
 			self.parseEventDetails(eventInfoDict)
-			urlEventInvitees = 'https://graph.facebook.com/v2.2/'+eventIdList[i]+'/invited?access_token='+access_token
-			inviteeInfoDict = self.getEventInvitees(urlEventInvitees)
-			self.parseEventAttendee(inviteeInfoDict)
+			#urlEventInvitees = 'https://graph.facebook.com/v2.2/'+eventIdList[i]+'/invited?access_token='+access_token
+			#inviteeInfoDict = self.getEventInvitees(eventIdList[i])
+			self.parseEventAttendee(eventIdList[i])
 			print dataPerEvent
 			dataPerEvent = []
 			maybeCount = 0
