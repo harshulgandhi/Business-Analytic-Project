@@ -11,13 +11,14 @@ the same event
 debug = True
 class FBAPI_AttendeeFriends:
 	'Class to make API calls to facebook and fetch friends of users'
+	accessToken = 'CAACEdEose0cBAMx8ChDs83qfXaAjBJBFRn1cZCNxeQJUiA6K5KGID45yuindTZAtwZBdIYKvrVP6PlUzMIT61OfI2204PCUoAni9Ssav6YVqcx17ciUHUj2bGkpd9cnTilCfutRp4RNbpBaQfflYXljZBPqALpbtSP6HedDZC1ZBWKwsWYzZBAK0RoC5KSYpVKdsZCXpgy9XFtCGZBmcXXTfY' 
 	def __init__(self,eventId):
 		print "Fetching list of friends for attendees...."
-		# fbapi1 = FBAPI_Events()
-		# attendeeInfoDict = fbapi1.getEventById(eventId)
-		# fl = open('attending.txt',"w")
-		# print type(attendeeInfoDict)
-		# fl.write(str(attendeeInfoDict))
+		fbapi1 = FBAPI_Events()
+		attendeeInfoDict = fbapi1.getEventById(eventId)
+		fl = open('attending.txt',"w")
+		#print type(attendeeInfoDict)
+		fl.write(str(attendeeInfoDict))
 		# if(debug):
 		# 	#print attendeeInfoDict
 		# 	print "Printing ID of first attendee"
@@ -30,32 +31,16 @@ class FBAPI_AttendeeFriends:
 			#  		break
 
 	def getFriendsList(self,id):
-		accessToken = 'CAACEdEose0cBAGaZAJdSfmJDbMzWBmZCrHD44yGdFuxocRRxfGYn3mL7quttIA0Ir419uxUnm6SfPlU9sYl39aXl2DRmtCJFaQF3rpipBL5N4VRhIyrnPrtHV7my6KgRjhsFvP3iCZAWvvnmrjXh5Hs3nY13byCY7wTAl7MAKFyp05h7YZCqShIgl289rMoH7cs63Wc0KpmDpdHKx2wP'
-		urlGetFriends = 'https://graph.facebook.com/v1.0/'+id+'/friends?access_token='+accessToken 		#+'/friends?access_token='+accessToken
+		#global accessToken
+		urlGetFriends = 'https://graph.facebook.com/v1.0/'+id+'/friends?access_token='+self.accessToken  		#+'/friends?access_token='+accessToken
 		if(debug):
 			print 'urlGetFriends : '+urlGetFriends
 		#url = 'https://graph.facebook.com/v2.2/1094488052/friends?limit=25&offset=25&__after_id=enc_AdBofZBoJg1Tj0jeztIFtgOsHuJhXpEOZCquLKPeAhee1GBZAOwGeKzzOoNzFKfDntcUcTdBgABhX8HvXBrEzacBDaO'
 		friendsList = urlopen(urlGetFriends)
 		friendsListDict = loads(friendsList.read())
-
-		print "######################"
-		print friendsListDict
-
-
-	'''
-	Function to check connection between two ids
-	@param id1: id of first user
-	@param id2: id of second user
-	'''
-	def checkConnection(self,id1,id2):
-		accessToken = 'CAACEdEose0cBAGaZAJdSfmJDbMzWBmZCrHD44yGdFuxocRRxfGYn3mL7quttIA0Ir419uxUnm6SfPlU9sYl39aXl2DRmtCJFaQF3rpipBL5N4VRhIyrnPrtHV7my6KgRjhsFvP3iCZAWvvnmrjXh5Hs3nY13byCY7wTAl7MAKFyp05h7YZCqShIgl289rMoH7cs63Wc0KpmDpdHKx2wP'
-		urlGetConnection = 'https://graph.facebook.com/v2.2/'+id1+'/friends/'+id2+'?access_token='+accessToken
-		status = urlopen(urlGetConnection)
-		if(status is null):
-			return False
-		else:
-			return True
-
+		if(debug):
+			print "######################"
+			print friendsListDict
 
 
 	'''
@@ -69,12 +54,43 @@ class FBAPI_AttendeeFriends:
 		fl = open('attending.txt',"w")
 		print type(attendeeInfoDict)
 		fl.write(str(attendeeInfoDict))
-		for key0 in attendeeInfoDict.keys():
-			for i in range(0,len(attendeeInfoDict[key0]),1):
-				for j in range (i,len(attendeeInfoDict[key0]),1):
-					areConnected = checkConnection(attendeeInfoDict[key0][i]['id'],attendeeInfoDict[key0][j]['id'])
-					if(areConnected):
-						print attendeeInfoDict[key0][i]['name']+" is connected to "+attendeeInfoDict[key0][j]['name']
+		for key in attendeeInfoDict.keys():
+
+			if debug:
+				test = open('testresult.txt',"w")
+				if(key == "data"):
+					print "\nNumber of attending users retrieved is : "+str(len(attendeeInfoDict[key]))+"\n"
+					for i in range(1,len(attendeeInfoDict[key]),1):
+						for j in range (i,len(attendeeInfoDict[key]),1):
+							if(debug):
+								print "To debug"
+								print "ids being checked are "+attendeeInfoDict[key][i]['id']+" AND "+attendeeInfoDict[key][j]['id']
+							areConnected = self.checkConnection(attendeeInfoDict[key][i]['id'],attendeeInfoDict[key][j]['id'])
+							if areConnected:
+								print attendeeInfoDict[key][i]['name'].decode('utf-8')+" is connected to "+attendeeInfoDict[key][j]['name'].decode('utf-8')
+								return
+							# elif areConnected==False:
+							#  	print str(attendeeInfoDict[key][i]['name'].decode('utf-8'))+" is **NOT** connected to "+str(attendeeInfoDict[key][j]['name'].decode('utf-8'))
+
+
+
+	'''
+	Function to check connection between two ids
+	@param id1: id of first user
+	@param id2: id of second user
+	'''
+	def checkConnection(self,id1,id2):
+		global accessToken
+		urlGetConnection = 'https://graph.facebook.com/v2.2/'+id1+'/friends/'+id2+'?access_token='+self.accessToken
+		status = loads(urlopen(urlGetConnection).read())
+		if(debug):
+			print "status returned is "+str(status['data'])
+		if(len(status['data']) == 0):
+			if(debug):
+				print "Returning false"
+			return False
+		else:
+			return True
 
 
 
